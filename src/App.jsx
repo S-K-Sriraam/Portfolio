@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useState, useRef } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
 import { View, Preload } from '@react-three/drei';
@@ -14,32 +14,50 @@ import {
   Footer,
   ScrollProgressBar,
   BackToTop,
+  AntigravityHUD,
 } from './components';
 import { StarsCanvas } from './components/canvas';
 
 const App = () => {
   const container = useRef();
+  const [isZeroGravity, setIsZeroGravity] = useState(false);
+
+  const toggleGravity = () => {
+    setIsZeroGravity((prev) => !prev);
+  };
 
   return (
     <BrowserRouter> 
-      <div ref={container} className="relative z-0 bg-primary text-white selection:bg-[#915eff] selection:text-white overflow-x-hidden min-h-screen">
+      <div 
+        ref={container} 
+        className="relative z-0 bg-primary text-white selection:bg-[#915eff] selection:text-white overflow-x-hidden min-h-screen"
+      >
         {/* Top Reading Progress Bar */}
         <ScrollProgressBar />
 
+        {/* Antigravity Ambient Cursor Spotlight & Interactive HUD Terminal */}
+        <AntigravityHUD 
+          isZeroGravity={isZeroGravity} 
+          onToggleGravity={toggleGravity} 
+        />
+
         {/* Navigation Bar */}
-        <Navbar />
+        <Navbar 
+          isZeroGravity={isZeroGravity} 
+          onToggleGravity={toggleGravity} 
+        />
 
         {/* Hero Section */}
         <div className="bg-hero-pattern bg-cover bg-no-repeat bg-center relative">
-          <Hero />
+          <Hero isZeroGravity={isZeroGravity} />
         </div>
 
         {/* Main Content Flow */}
         <div className="relative z-10 space-y-4">
-          <About />
-          <Experience />
-          <Tech />
-          <Works />
+          <About isZeroGravity={isZeroGravity} />
+          <Experience isZeroGravity={isZeroGravity} />
+          <Tech isZeroGravity={isZeroGravity} />
+          <Works isZeroGravity={isZeroGravity} />
           <Feedbacks />
         </div>
 
@@ -71,5 +89,3 @@ const App = () => {
 };
 
 export default App;
-
-

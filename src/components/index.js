@@ -10,4 +10,6 @@ export { default as Works } from "./Works";
 export { default as Footer } from "./Footer";
 export { default as ScrollProgressBar } from "./ScrollProgressBar";
 export { default as BackToTop } from "./BackToTop";
-
+export { default as AntigravityHUD } from "./AntigravityHUD";
+export { default as ProjectModal } from "./ProjectModal";
+export { default as CountUp } from "./CountUp";

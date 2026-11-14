@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import { styles } from "../styles";
 import { navLinks } from "../constants";
 import { logo, menu, close } from "../assets";
+import { playChirp } from "../utils/sound";
 
-function Navbar() {
+function Navbar({ isZeroGravity, onToggleGravity }) {
   const [active, setActive] = useState("");
   const [toggle, setToggle] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -51,21 +52,29 @@ function Navbar() {
           to="/"
           className="flex items-center gap-3 transition-transform duration-300 hover:scale-[1.02]"
           onClick={() => {
+            playChirp("click");
             setActive("");
             window.scrollTo({ top: 0, behavior: "smooth" });
           }}
+          onMouseEnter={() => playChirp("hover")}
         >
-          <img
-            src={logo}
-            alt="logo"
-            className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-full border border-white/20 shadow-[0_0_15px_rgba(145,94,255,0.3)] transition-all duration-300 hover:rotate-6 hover:scale-110 hover:border-[#915eff]"
-          />
-          <p className="text-white text-[16px] sm:text-[18px] font-bold cursor-pointer flex items-center tracking-tight transition-colors duration-300 hover:text-[#915eff]">
-            Sriraam S K &nbsp;
-            <span className="sm:inline hidden text-secondary font-normal text-[14px]">
-              | Full Stack & Systems Builder
+          <div className="relative">
+            <img
+              src={logo}
+              alt="logo"
+              className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-full border border-white/20 shadow-[0_0_15px_rgba(145,94,255,0.35)] transition-all duration-300 hover:rotate-6 hover:scale-110 hover:border-[#915eff]"
+            />
+            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#00cea8] border-2 border-primary" />
+          </div>
+
+          <div className="flex flex-col">
+            <p className="text-white text-[16px] sm:text-[18px] font-bold cursor-pointer flex items-center tracking-tight transition-colors duration-300 hover:text-[#915eff]">
+              Sriraam S K
+            </p>
+            <span className="text-secondary font-mono text-[11px] -mt-0.5 tracking-wider text-[#00cea8]/80 hidden sm:inline">
+              SYS_ENGINEER // FULL_STACK
             </span>
-          </p>
+          </div>
         </Link>
 
         {/* Desktop navigation */}
@@ -79,7 +88,11 @@ function Navbar() {
                 } relative text-[15px] cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:text-white after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:rounded-full after:transition-all after:duration-300 ${
                   active === link.title ? "after:w-full after:bg-[#915eff]" : "after:w-0 after:bg-white hover:after:w-full"
                 }`}
-                onClick={() => setActive(link.title)}
+                onMouseEnter={() => playChirp("hover")}
+                onClick={() => {
+                  playChirp("click");
+                  setActive(link.title);
+                }}
               >
                 <a href={`#${link.id}`}>{link.title}</a>
               </li>
@@ -89,6 +102,8 @@ function Navbar() {
           {/* Quick CTA */}
           <a
             href="#contact"
+            onMouseEnter={() => playChirp("hover")}
+            onClick={() => playChirp("click")}
             className="px-4.5 py-2 rounded-xl bg-gradient-to-r from-[#915eff] to-[#804dee] text-white font-semibold text-[13px] shadow-[0_0_15px_rgba(145,94,255,0.35)] hover:shadow-[0_0_25px_rgba(145,94,255,0.6)] hover:scale-105 transition-all duration-300 flex items-center gap-1.5"
           >
             <span>Let's Talk</span>
@@ -96,13 +111,16 @@ function Navbar() {
           </a>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile menu toggle */}
         <div className="md:hidden flex flex-1 justify-end items-center">
           <button
             type="button"
             aria-label="Toggle Navigation Menu"
-            className="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
-            onClick={() => setToggle(!toggle)}
+            className="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer"
+            onClick={() => {
+              playChirp("click");
+              setToggle(!toggle);
+            }}
           >
             <img
               src={toggle ? close : menu}
@@ -124,6 +142,7 @@ function Navbar() {
                     active === link.title ? "text-[#915eff] font-semibold" : "text-secondary font-medium"
                   } font-poppins cursor-pointer text-[15px] transition-all duration-300 hover:translate-x-1.5 hover:text-white w-full py-1`}
                   onClick={() => {
+                    playChirp("click");
                     setToggle(false);
                     setActive(link.title);
                   }}
@@ -136,7 +155,10 @@ function Navbar() {
               <li className="w-full pt-2 border-t border-white/10">
                 <a
                   href="#contact"
-                  onClick={() => setToggle(false)}
+                  onClick={() => {
+                    playChirp("click");
+                    setToggle(false);
+                  }}
                   className="block text-center w-full py-2.5 rounded-xl bg-gradient-to-r from-[#915eff] to-[#804dee] text-white font-semibold text-[13px]"
                 >
                   Get In Touch 💬
@@ -151,4 +173,3 @@ function Navbar() {
 }
 
 export default Navbar;
-

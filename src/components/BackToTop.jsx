@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { playChirp } from '../utils/sound';
 
 const BackToTop = () => {
   const [visible, setVisible] = useState(false);
@@ -20,6 +21,7 @@ const BackToTop = () => {
   }, []);
 
   const scrollToTop = () => {
+    playChirp("click");
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
@@ -33,6 +35,7 @@ const BackToTop = () => {
           type="button"
           aria-label="Scroll to top"
           onClick={scrollToTop}
+          onMouseEnter={() => playChirp("hover")}
           initial={{ opacity: 0, scale: 0.5, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.5, y: 20 }}
@@ -63,9 +66,9 @@ const BackToTop = () => {
             />
           </svg>
 
-          {/* Icon in center */}
-          <span className="absolute text-[13px] font-bold text-white group-hover:text-[#00cea8] transition-colors">
-            ?
+          {/* Up arrow icon in center */}
+          <span className="absolute text-[16px] font-bold text-white group-hover:text-[#00cea8] transition-colors leading-none">
+            ↑
           </span>
         </motion.button>
       )}

@@ -6,6 +6,8 @@ import { github } from '../assets';
 import { SectionWrapper } from '../hoc';
 import { projects } from '../constants';
 import { fadeIn, textVariant } from '../utils/motion';
+import ProjectModal from './ProjectModal';
+import { playChirp } from '../utils/sound';
 
 const getCategoryBadge = (category) => {
   switch (category) {
@@ -42,6 +44,8 @@ const ProjectCard = ({
   imageClassName = "object-cover",
   source_code_link,
   live_link,
+  onOpenModal,
+  isZeroGravity,
 }) => {
   const badge = getCategoryBadge(category);
 
@@ -49,30 +53,61 @@ const ProjectCard = ({
     <motion.div
       layout
       initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
+      animate={
+        isZeroGravity
+          ? {
+              opacity: 1,
+              scale: 1,
+              y: [-4, 4, -4],
+            }
+          : {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+            }
+      }
       exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.35, delay: (index % 6) * 0.05 }}
+      transition={{
+        duration: isZeroGravity ? 3.5 + (index % 3) * 0.5 : 0.35,
+        repeat: isZeroGravity ? Infinity : 0,
+        ease: "easeInOut",
+        delay: (index % 6) * 0.05,
+      }}
       className="w-full flex"
     >
       <Tilt
         options={{
-          max: 20,
+          max: 18,
           scale: 1.02,
           speed: 450,
         }}
-        className="bg-[#151030] p-5 sm:p-6 rounded-3xl w-full border border-white/10 shadow-2xl transition-all duration-300 hover:border-[#915eff]/50 hover:shadow-[0_15px_35px_rgba(145,94,255,0.15)] flex flex-col justify-between group"
+        className="bg-[#151030] p-5 sm:p-6 rounded-3xl w-full border border-white/10 shadow-2xl transition-all duration-300 hover:border-[#915eff]/60 hover:shadow-[0_15px_35px_rgba(145,94,255,0.2)] flex flex-col justify-between group"
       >
         <div>
-          {/* Image Container */}
-          <div className="relative w-full h-[220px] rounded-2xl overflow-hidden border border-white/10 bg-[#0d0921]">
+          {/* Image Container with Hover Inspect Overlay */}
+          <div 
+            onClick={() => {
+              playChirp("open");
+              onOpenModal();
+            }}
+            onMouseEnter={() => playChirp("hover")}
+            className="relative w-full h-[220px] rounded-2xl overflow-hidden border border-white/10 bg-[#0d0921] cursor-pointer"
+          >
             <img
               src={image}
               alt={name}
-              className={`w-full h-full ${imageClassName} transition-transform duration-500 group-hover:scale-105`}
+              className={`w-full h-full ${imageClassName} transition-transform duration-500 group-hover:scale-108`}
             />
 
+            {/* Quick Inspect Hover Tint */}
+            <div className="absolute inset-0 bg-[#09051d]/75 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2 backdrop-blur-[2px]">
+              <span className="px-4 py-2 rounded-xl bg-[#915eff] text-white font-bold text-[12px] shadow-[0_0_20px_#915eff] flex items-center gap-1.5">
+                <span>🔍 Inspect Architecture</span>
+              </span>
+            </div>
+
             {/* Category Tag Top Left */}
-            <div className="absolute top-3 left-3 z-10">
+            <div className="absolute top-3 left-3 z-10 pointer-events-none">
               <span
                 className={`px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide border backdrop-blur-md shadow-md ${badge.className}`}
               >
@@ -81,39 +116,51 @@ const ProjectCard = ({
             </div>
 
             {/* Action Buttons Top Right */}
-            <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
+            <div className="absolute top-3 right-3 z-10 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
               {live_link && (
                 <a
                   href={live_link}
                   target="_blank"
                   rel="noopener noreferrer"
                   title="View Live Webpage"
-                  className="px-3 py-1.5 rounded-full bg-gradient-to-r from-[#915eff] to-[#00cea8] text-white font-semibold text-[11px] shadow-lg hover:scale-105 transition-all flex items-center gap-1 backdrop-blur-md"
+                  onMouseEnter={() => playChirp("hover")}
+                  onClick={() => playChirp("click")}
+                  className="px-3 py-1.5 rounded-full bg-gradient-to-r from-[#915eff] to-[#00cea8] text-white font-semibold text-[11px] shadow-lg hover:scale-105 transition-all flex items-center gap-1 backdrop-blur-md cursor-pointer"
                 >
                   <span>Live</span>
                   <span>↗</span>
                 </a>
               )}
 
-              <a
-                href={source_code_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="View Source on GitHub"
-                className="black-gradient w-9 h-9 rounded-full flex justify-center items-center cursor-pointer border border-white/20 shadow-lg hover:border-[#915eff] hover:scale-110 transition-all backdrop-blur-md"
-              >
-                <img
-                  src={github}
-                  alt="github"
-                  className="w-4 h-4 object-contain"
-                />
-              </a>
+              {source_code_link && (
+                <a
+                  href={source_code_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="View Source on GitHub"
+                  onMouseEnter={() => playChirp("hover")}
+                  onClick={() => playChirp("click")}
+                  className="black-gradient w-9 h-9 rounded-full flex justify-center items-center cursor-pointer border border-white/20 shadow-lg hover:border-[#915eff] hover:scale-110 transition-all backdrop-blur-md"
+                >
+                  <img
+                    src={github}
+                    alt="github"
+                    className="w-4 h-4 object-contain"
+                  />
+                </a>
+              )}
             </div>
           </div>
 
           {/* Text Information */}
           <div className="mt-5">
-            <h3 className="text-white font-bold text-[20px] sm:text-[22px] tracking-tight group-hover:text-[#915eff] transition-colors line-clamp-1">
+            <h3 
+              onClick={() => {
+                playChirp("open");
+                onOpenModal();
+              }}
+              className="text-white font-bold text-[20px] sm:text-[22px] tracking-tight group-hover:text-[#915eff] transition-colors line-clamp-1 cursor-pointer"
+            >
               {name}
             </h3>
             <p className="mt-2.5 text-secondary text-[14px] leading-[24px] line-clamp-3">
@@ -122,25 +169,40 @@ const ProjectCard = ({
           </div>
         </div>
 
-        {/* Tags & Badges */}
-        <div className="mt-5 flex flex-wrap gap-2 pt-4 border-t border-white/5">
-          {tags.map((tag) => (
-            <span
-              key={tag.name}
-              className={`text-[12px] font-medium px-2.5 py-1 rounded-lg bg-black-200/80 border border-white/5 ${tag.color}`}
-            >
-              #{tag.name}
-            </span>
-          ))}
+        {/* Tags & Architecture Link */}
+        <div className="mt-5 pt-4 border-t border-white/5 flex flex-col gap-3">
+          <div className="flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <span
+                key={tag.name}
+                className={`text-[12px] font-medium px-2.5 py-1 rounded-lg bg-black-200/80 border border-white/5 ${tag.color}`}
+              >
+                #{tag.name}
+              </span>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              playChirp("open");
+              onOpenModal();
+            }}
+            className="w-full py-2 rounded-xl bg-white/5 hover:bg-[#915eff]/20 border border-white/10 hover:border-[#915eff]/50 text-secondary hover:text-white text-[12px] font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            <span>Architecture Breakdown</span>
+            <span>⚡</span>
+          </button>
         </div>
       </Tilt>
     </motion.div>
   );
 };
 
-const Works = () => {
+const Works = ({ isZeroGravity }) => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedProject, setSelectedProject] = useState(null);
 
   const tabs = [
     { id: 'all', label: 'All Projects', icon: '🚀', count: projects.length },
@@ -179,7 +241,7 @@ const Works = () => {
   return (
     <>
       <motion.div variants={textVariant()}>
-        <p className={styles.sectionSubText}>Featured Creations</p>
+        <p className={styles.sectionSubText}>Engineered Portfolios</p>
         <h2 className={styles.sectionHeadText}>Projects.</h2>
       </motion.div>
 
@@ -193,7 +255,7 @@ const Works = () => {
           engineered across{' '}
           <span className="text-white font-semibold">Full Stack Web Development</span>,{' '}
           <span className="text-[#00cea8] font-medium">IoT & Embedded Hardware</span>, and{' '}
-          <span className="text-[#915eff] font-medium">AI & Data Intelligence</span>.
+          <span className="text-[#915eff] font-medium">AI & Data Intelligence</span>. Click any project card to inspect its system architecture blueprint.
         </motion.p>
       </div>
 
@@ -207,7 +269,11 @@ const Works = () => {
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id)}
+                onMouseEnter={() => playChirp("hover")}
+                onClick={() => {
+                  playChirp("click");
+                  setActiveTab(tab.id);
+                }}
                 className={`px-4 sm:px-5 py-2.5 rounded-xl font-semibold text-[13px] sm:text-[14px] transition-all duration-300 flex items-center gap-2 cursor-pointer border relative ${
                   isActive
                     ? 'bg-gradient-to-r from-[#915eff] to-[#804dee] text-white border-[#915eff] shadow-[0_0_20px_rgba(145,94,255,0.4)] scale-105'
@@ -245,7 +311,10 @@ const Works = () => {
           {searchQuery && (
             <button
               type="button"
-              onClick={() => setSearchQuery('')}
+              onClick={() => {
+                playChirp("click");
+                setSearchQuery('');
+              }}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-white text-[12px] bg-white/10 w-5 h-5 rounded-full flex items-center justify-center cursor-pointer"
             >
               ✕
@@ -263,6 +332,8 @@ const Works = () => {
                 key={`project-${project.name}`}
                 index={index}
                 {...project}
+                isZeroGravity={isZeroGravity}
+                onOpenModal={() => setSelectedProject(project)}
               />
             ))}
           </AnimatePresence>
@@ -277,6 +348,7 @@ const Works = () => {
           <button
             type="button"
             onClick={() => {
+              playChirp("click");
               setSearchQuery('');
               setActiveTab('all');
             }}
@@ -286,6 +358,13 @@ const Works = () => {
           </button>
         </div>
       )}
+
+      {/* Architecture Deep-Dive Modal */}
+      <ProjectModal
+        project={selectedProject}
+        isOpen={!!selectedProject}
+        onClose={() => setSelectedProject(null)}
+      />
     </>
   );
 };
